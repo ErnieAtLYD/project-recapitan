@@ -30,6 +30,9 @@ export class RecapitanSettingTab extends PluginSettingTab {
 		}
 	}
 
+	/**
+	 * Displays the settings UI.
+	 */
 	display(): void {
 		// Move settings UI code here...
 		const { containerEl } = this;
@@ -53,36 +56,39 @@ export class RecapitanSettingTab extends PluginSettingTab {
 					})
 			);
 
-		new Setting(containerEl)
-			.setName("Ollama Host")
-			.setDesc("The URL of your Ollama instance")
-			.addText((text) =>
-				text
-					.setPlaceholder("http://localhost:11434")
-					.setValue(this.plugin.settings.ollamaHost)
-					.onChange(async (value) => {
-						await this.saveSettingsWithFeedback(async () => {
-							this.plugin.settings.ollamaHost = value;
-							await this.plugin.saveSettings();
-						});
-					})
-			)
-			.setDisabled(this.plugin.settings.aiProvider !== "ollama");
+		if (this.plugin.settings.aiProvider === "ollama") {
+			new Setting(containerEl)
+				.setName("Ollama Host")
+				.setDesc("The URL of your Ollama instance")
+				.addText((text) =>
+					text
+						.setPlaceholder("http://localhost:11434")
+						.setValue(this.plugin.settings.ollamaHost)
+						.onChange(async (value) => {
+							await this.saveSettingsWithFeedback(async () => {
+								this.plugin.settings.ollamaHost = value;
+								await this.plugin.saveSettings();
+							});
+						})
+				);
+		}
 
-		new Setting(containerEl)
-			.setName("API Key")
-			.setDesc("Enter your AI provider API key")
-			.addText((text) =>
-				text
-					.setPlaceholder("Enter API key...")
-					.setValue(this.plugin.settings.apiKey)
-					.onChange(async (value) => {
-						await this.saveSettingsWithFeedback(async () => {
-							this.plugin.settings.apiKey = value;
-							await this.plugin.saveSettings();
-						});
-					})
-			);
+		if (this.plugin.settings.aiProvider === "openai") {
+			new Setting(containerEl)
+				.setName("API Key")
+				.setDesc("Enter your OpenAI API key")
+				.addText((text) =>
+					text
+						.setPlaceholder("Enter API key...")
+						.setValue(this.plugin.settings.apiKey)
+						.onChange(async (value) => {
+							await this.saveSettingsWithFeedback(async () => {
+								this.plugin.settings.apiKey = value;
+								await this.plugin.saveSettings();
+							});
+						})
+				);
+		}
 
 		new Setting(containerEl)
 			.setName("Analysis Schedule")
